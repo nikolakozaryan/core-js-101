@@ -223,7 +223,6 @@ function getRectangleString(width, height) {
       str += result.join('');
     }
   }
-  
   return str;
 }
 
