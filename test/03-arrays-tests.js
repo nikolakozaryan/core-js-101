@@ -733,11 +733,11 @@ describe('03-arrays-tasks', () => {
         ],
         keySelector: (item) => item.country,
         valueSelector: (item) => item.city,
-        expected: new Map([
-          ['Belarus', ['Brest', 'Grodno', 'Minsk']],
-          ['Russia', ['Omsk', 'Samara']],
-          ['Poland', ['Lodz']],
-        ]),
+          expected: new Map([
+            ['Belarus', ['Brest', 'Grodno', 'Minsk']],
+            ['Russia', ['Omsk', 'Samara']],
+            ['Poland', ['Lodz']],
+          ]),
       }, {
         arr: [
           { artist: 'ACDC', album: 'Highway to Hell' },
