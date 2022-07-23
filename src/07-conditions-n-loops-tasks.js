@@ -258,6 +258,25 @@ function reverseInteger(num) {
   return +(`${num}`).split('').reverse().join('');
 }
 
+/**
+ * Returns the digital root of integer:
+ *   step1 : find sum of all digits
+ *   step2 : if sum > 9 then goto step1 otherwise return the sum
+ *
+ * @param {number} n
+ * @return {number}
+ *
+ * @example:
+ *   12345 ( 1+2+3+4+5 = 15, 1+5 = 6) => 6
+ *   23456 ( 2+3+4+5+6 = 20, 2+0 = 2) => 2
+ *   10000 ( 1+0+0+0+0 = 1 ) => 1
+ *   165536 (1+6+5+5+3+6 = 26,  2+6 = 8) => 8
+ */
+function getDigitalRoot(num) {
+  if (`${num}`.length === 1) return num;
+  return getDigitalRoot(`${num}`.split('').reduce((acc, item) => acc + +item, 0));
+}
+
 
 /**
  * Validates the CCN (credit card number) and return true if CCN is valid
@@ -279,27 +298,15 @@ function reverseInteger(num) {
  *   5436468789016589 => false
  *   4916123456789012 => false
  */
-function isCreditCardNumber(/* ccn */) {
-  throw new Error('Not implemented');
-}
-
-/**
- * Returns the digital root of integer:
- *   step1 : find sum of all digits
- *   step2 : if sum > 9 then goto step1 otherwise return the sum
- *
- * @param {number} n
- * @return {number}
- *
- * @example:
- *   12345 ( 1+2+3+4+5 = 15, 1+5 = 6) => 6
- *   23456 ( 2+3+4+5+6 = 20, 2+0 = 2) => 2
- *   10000 ( 1+0+0+0+0 = 1 ) => 1
- *   165536 (1+6+5+5+3+6 = 26,  2+6 = 8) => 8
- */
-function getDigitalRoot(num) {
-  if (`${num}`.length === 1) return num;
-  return getDigitalRoot(`${num}`.split('').reduce((acc, item) => acc + +item, 0));
+function isCreditCardNumber(ccn) {
+  const sCcn = `${ccn}`.split('');
+  return !(
+    sCcn
+      .map((digit, index) => {
+        if (sCcn.length % 2) return index % 2 ? getDigitalRoot(digit * 2) : +digit;
+        return index % 2 ? +digit : getDigitalRoot(digit * 2);
+      }).reduce((acc, item) => acc + item) % 10
+  );
 }
 
 
@@ -324,8 +331,27 @@ function getDigitalRoot(num) {
  *   '{)' = false
  *   '{[(<{[]}>)]}' = true
  */
-function isBracketsBalanced(/* str */) {
-  throw new Error('Not implemented');
+function isBracketsBalanced(str) {
+  const stack = [];
+  const open = ['[', '{', '<', '('];
+  const comp = {
+    ']': '[',
+    '}': '{',
+    '>': '<',
+    ')': '(',
+  };
+  for (let i = 0; i < str.length; i += 1) {
+    if (open.includes(str[i])) {
+      stack.unshift(str[i]);
+    } else if (comp[str[i]]) {
+      if (comp[str[i]] === stack[0]) {
+        stack.shift();
+      } else {
+        return false;
+      }
+    }
+  }
+  return !stack.length;
 }
 
 
@@ -397,8 +423,20 @@ function getCommonDirectoryPath(pathes) {
  *                         [ 6 ]]
  *
  */
-function getMatrixProduct(/* m1, m2 */) {
-  throw new Error('Not implemented');
+function getMatrixProduct(m1, m2) {
+  const m2Cols = m2[0].length;
+  return m1.reduce((res, row) => {
+    const resRow = [];
+    for (let i = 0; i < m2Cols; i += 1) {
+      let val = 0;
+      for (let j = 0; j < row.length; j += 1) {
+        val += row[j] * m2[j][i];
+      }
+      resRow.push(val);
+    }
+    res.push(resRow);
+    return res;
+  }, []);
 }
 
 
@@ -432,8 +470,28 @@ function getMatrixProduct(/* m1, m2 */) {
  *    [    ,   ,    ]]
  *
  */
-function evaluateTicTacToePosition(/* position */) {
-  throw new Error('Not implemented');
+function evaluateTicTacToePosition(position) {
+  const combinations = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  const field = position
+    .map((row) => row.reduce((acc, item, index) => {
+      if (item) acc[index] = item;
+      return acc;
+    }, new Array(3).fill('.')))
+    .flat();
+  for (let i = 0; i < combinations.length; i += 1) {
+    if (combinations[i].every((pos) => field[pos] === 'X')) return 'X';
+    if (combinations[i].every((pos) => field[pos] === '0')) return '0';
+  }
+  return undefined;
 }
 
 
