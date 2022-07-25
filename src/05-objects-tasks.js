@@ -116,34 +116,93 @@ function fromJSON(proto, json) {
  *
  *  For more examples see unit tests.
  */
+class BuilderHelper {
+  constructor() {
+    this.res = '';
+    this.usedSelectors = [];
+    this.uniqueSelectors = ['element', 'id', 'pseudoElement'];
+    this.order = {
+      element: 0,
+      id: 1,
+      class: 2,
+      attribute: 3,
+      pseudoClass: 4,
+      pseudoElement: 5,
+    };
+    this.firstErr = 'Element, id and pseudo-element should not occur more then one time inside the selector';
+    this.secondErr = 'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element';
+  }
 
+  stringify() {
+    return this.res;
+  }
+
+  element(value) {
+    this.errorHandler('element');
+    this.res += value;
+    return this;
+  }
+
+  id(value) {
+    this.errorHandler('id');
+    this.res += `#${value}`;
+    return this;
+  }
+
+  class(value) {
+    this.errorHandler('class');
+    this.res += `.${value}`;
+    return this;
+  }
+
+  attr(value) {
+    this.errorHandler('attribute');
+    this.res += `[${value}]`;
+    return this;
+  }
+
+  pseudoClass(value) {
+    this.errorHandler('pseudoClass');
+    this.res += `:${value}`;
+    return this;
+  }
+
+  pseudoElement(value) {
+    this.errorHandler('pseudoElement');
+    this.res += `::${value}`;
+    return this;
+  }
+
+  errorHandler(selector) {
+    if (
+      this.usedSelectors.includes(selector)
+      && this.uniqueSelectors.includes(selector)
+    ) {
+      throw new Error(this.firstErr);
+    }
+    if (
+      this.order[this.usedSelectors.at(-1)]
+      > this.order[selector]
+    ) {
+      throw new Error(this.secondErr);
+    }
+
+    this.usedSelectors.push(selector);
+  }
+}
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  id: (value) => new BuilderHelper().id(value),
+  attr: (value) => new BuilderHelper().attr(value),
+  class: (value) => new BuilderHelper().class(value),
+  element: (value) => new BuilderHelper().element(value),
+  pseudoClass: (value) => new BuilderHelper().pseudoClass(value),
+  pseudoElement: (value) => new BuilderHelper().pseudoElement(value),
+  combine(selector1, combinator, selector2) {
+    this.res = `${selector1.res} ${combinator} ${selector2.res}`;
+    return this;
   },
-
-  id(/* value */) {
-    throw new Error('Not implemented');
-  },
-
-  class(/* value */) {
-    throw new Error('Not implemented');
-  },
-
-  attr(/* value */) {
-    throw new Error('Not implemented');
-  },
-
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
-  },
-
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
-  },
-
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  stringify() {
+    return this.res;
   },
 };
 
